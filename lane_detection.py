@@ -55,7 +55,7 @@ def get_slopes_intercepts(img, lines):
     """Returns slopes and bottom x-intercepts of given lines in an image
     args: 
         img (image path or np.ndarray): image that lines reside in
-        lines (list): list of points [[x1, y2, x2, y2], ...] of the lines being drawn
+        lines (list): list of points [[x1, y2, x2, y2], ...] of the lines
     returns:
         (list, list): 2 lists of the slopes and intercepts of the specified lines
         """
@@ -71,7 +71,11 @@ def get_slopes_intercepts(img, lines):
 
 def detect_lanes(imageInput, lines):
     """Detects lanes from given lines and an image.
-    imageInput (image path or np.ndarray): 
+    args:
+        imageInput (image path or np.ndarray): image that lines originate from
+        lines (list): list of points [[x1, y2, x2, y2], ...] of the lines
+    return:
+        (list): list of possible lanes, each lane containing 2 lines with points - [[[x, x, x, x], [x, x, x, x]], ...]
     """
     image = cv2.imread(imageInput)
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -100,6 +104,13 @@ def detect_lanes(imageInput, lines):
     return possibleLanes 
 
 def draw_lanes(img, lanes):
+    """draws specified lanes on a given image.
+    args:
+        img (image path or np.ndarray): image that lanes are drawn on
+        lanes (list): list of possible lanes, each lane containing 2 lines with points - [[[x, x, x, x], [x, x, x, x]], ...]
+    return:
+        (np.ndarray): image with specified lanes drawn on
+        """
     image = cv2.imread(img)
     for lane in lanes:
         for line in lane:
