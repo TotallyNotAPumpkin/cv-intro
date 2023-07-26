@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 def detect_lines(img, threshold1 = 50, threshold2 = 150, apertureSize = 3, minLineLength = 100, maxLineGap = 10):
     image = cv2.imread(img)
@@ -32,7 +33,7 @@ def draw_lines(img, lines, color = (0, 255, 0)):
     return image
 
 def get_slopes_intercepts(img, lines):
-    image = cv2.imread(img)
+    image = img
     slopes = []
     intercepts = []
     height = image.shape[0]
@@ -42,14 +43,32 @@ def get_slopes_intercepts(img, lines):
         intercepts.append((height-line[1])/slope + line[0])
     return slopes, intercepts
 
-def detect_lanes(img, lines):
-    slopes, intercepts = get_slopes_intercepts(lines)
-    lineDict = dict(zip(intercepts, slopes))
-    height = cv2.imread(img).shape[0]
+def detect_lanes(imageInput, lines):
+    image = cv2.imread(imageInput)
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    slopes, intercepts = get_slopes_intercepts(img, lines)
+    lineDict = dict(sorted(zip(intercepts, slopes)))
+    height = img.shape[0]
     possibleLanes = []
 
-    # taking two points and checking if between them is dark:
-
+    # finding lines with similar slopes and intercepts
+    for i in range(1, len(lineDict)):
+        # checks if slopes and intercepts are similar
+        intercept1, intercept2 = list(lineDict)[i-1], list(lineDict)[i]
+        slope1, slope2 = list(lineDict.values())[i-1], list(lineDict.values())[i]
+        if abs(intercept1 - intercept2) < 500 and abs(slope1 - slope2) < 3:
+            # find the fuckin in between line darkness
+            centerM2 = int((intercept1 + intercept2) / 2 - 2)
+            averageDark = 0
+            for pixel in range(centerM2, (centerM2 + 5)):
+                colorValue = img[(height-2), pixel]
+                averageDark += colorValue
+            if (averageDark/5) <= 75:
+            # finds indices of lines list that correspond to lanes
+                index1, index2 = intercepts.index(list(lineDict)[i-1]), intercepts.index(list(lineDict)[i])
+                line1, line2 = lines[index1], lines[index2]
+                possibleLanes.append([line1, line2])
+    return possibleLanes 
 
 
 
