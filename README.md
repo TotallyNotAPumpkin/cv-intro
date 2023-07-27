@@ -1,7 +1,4 @@
 # cv-intro
-<<<<<<< HEAD
-i am mald
-=======
 
 ## Capture Video Stream
 
@@ -40,4 +37,3 @@ sudo wpa_cli -i wlan0 list_networks
 ```bash
 sudo wpa_cli -i wlan0 select_network 0
 ```
->>>>>>> 2683a27b54046eea3fc6d704c0a520ecca387589
