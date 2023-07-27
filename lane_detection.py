@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 
 def detect_lines(img, threshold1 = 50, threshold2 = 150, apertureSize = 3, minLineLength = 100, maxLineGap = 10):
     """Detects if lines are present in an image (pool).
@@ -15,10 +14,11 @@ def detect_lines(img, threshold1 = 50, threshold2 = 150, apertureSize = 3, minLi
     returns:
         (list): list of points [[x1, y2, x2, y2], ...] that correspond to detected lines
     """
-    image = cv2.imread(img)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # convert to grayscale
-    grayCon = cv2.addWeighted(gray, 2, gray, 0, 0)
-    edges = cv2.Canny(grayCon, threshold1, threshold2, apertureSize=apertureSize) # detect edges
+    if not isinstance(img, np.ndarray):
+        img = cv2.imread(img)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # convert to grayscale
+    # grayCon = cv2.addWeighted(gray, 2, gray, 0, 0)
+    edges = cv2.Canny(gray, threshold1, threshold2, apertureSize=apertureSize) # detect edges
     lines = cv2.HoughLinesP(
                     edges,
                     1,
@@ -33,7 +33,7 @@ def detect_lines(img, threshold1 = 50, threshold2 = 150, apertureSize = 3, minLi
         for line in lines:
             x1, y1, x2, y2 = line[0]
             linexy = [x1, y1, x2, y2]
-            cv2.line(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
             lineList.append(linexy)
     return lineList
 
@@ -46,10 +46,11 @@ def draw_lines(img, lines, color = (0, 255, 0)):
     returns:
         (np.ndarray): image with lines drawn on
     """
-    image = cv2.imread(img)
+    if not isinstance(img, np.ndarray):
+        img = cv2.imread(img)
     for line in lines:
-        cv2.line(image, (line[0], line[1]), (line[2], line[3]), color, 3) 
-    return image
+        cv2.line(img, (line[0], line[1]), (line[2], line[3]), color, 3) 
+    return img
 
 def get_slopes_intercepts(img, lines):
     """Returns slopes and bottom x-intercepts of given lines in an image
@@ -59,10 +60,11 @@ def get_slopes_intercepts(img, lines):
     returns:
         (list, list): 2 lists of the slopes and intercepts of the specified lines
         """
-    image = img
+    if not isinstance(img, np.ndarray):
+        img = cv2.imread(img)
     slopes = []
     intercepts = []
-    height = image.shape[0]
+    height = img.shape[0]
     for line in lines:
         slope = (line[1] - line[3]) / (line[0] - line[2])
         slopes.append(slope)
@@ -77,8 +79,9 @@ def detect_lanes(imageInput, lines):
     return:
         (list): list of possible lanes, each lane containing 2 lines with points - [[[x, x, x, x], [x, x, x, x]], ...]
     """
-    image = cv2.imread(imageInput)
-    img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    if not isinstance(imageInput, np.ndarray):
+        imageInput = cv2.imread(imageInput)
+    img = cv2.cvtColor(imageInput, cv2.COLOR_BGR2GRAY)
     slopes, intercepts = get_slopes_intercepts(img, lines)
     lineDict = dict(sorted(zip(intercepts, slopes)))
     height = img.shape[0]
@@ -89,19 +92,20 @@ def detect_lanes(imageInput, lines):
         # checks if slopes and intercepts are similar
         intercept1, intercept2 = list(lineDict)[i-1], list(lineDict)[i]
         slope1, slope2 = list(lineDict.values())[i-1], list(lineDict.values())[i]
-        if abs(intercept1 - intercept2) < 500 and abs(slope1 - slope2) < 3:
+        if abs(intercept1 - intercept2) < 350 and abs(intercept1 - intercept2) > 10 and abs(slope1 - slope2) < 4 and abs(slope1 - slope2) > 0.03:
             # find the fuckin in between line darkness
             centerM2 = int((intercept1 + intercept2) / 2 - 2)
             averageDark = 0
             for pixel in range(centerM2, (centerM2 + 5)):
-                colorValue = img[(height-2), pixel]
+                colorValue = img[(height-2)][pixel]
                 averageDark += colorValue
             if (averageDark/5) <= 75:
             # finds indices of lines list that correspond to lanes
                 index1, index2 = intercepts.index(list(lineDict)[i-1]), intercepts.index(list(lineDict)[i])
                 line1, line2 = lines[index1], lines[index2]
                 possibleLanes.append([line1, line2])
-    return possibleLanes 
+    return possibleLanes
+
 
 def draw_lanes(img, lanes):
     """draws specified lanes on a given image.
@@ -111,7 +115,8 @@ def draw_lanes(img, lanes):
     return:
         (np.ndarray): image with specified lanes drawn on
         """
-    image = cv2.imread(img)
+    if not isinstance(img, np.ndarray):
+        image = cv2.imread(img)
     for lane in lanes:
         for line in lane:
             cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 255, 255), 4) 
@@ -119,6 +124,9 @@ def draw_lanes(img, lanes):
 
 # cv2.line(image, start_point, end_point, color, thickness) 
 if __name__ == "__main__":
-    lines = detect_lines('poollanes.jpg', 250, 270)
-    plt.imshow(draw_lines('poollanes.jpg', [[30, 40, 100, 100], [200, 200, 300, 300]]))
-    print(lines)
+    image = cv2.imread('lanes.png')
+    img = cv2.resize(image, (image.shape[1] // 2, image.shape[0] // 2))
+    lines = detect_lines(img, 30, 100, 3, 229, 13)
+    lanes = detect_lanes(img, lines)
+    print(f"Possible lines: {lines}")
+    print(f"Possible lanes: {lanes}")
