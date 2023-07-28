@@ -21,7 +21,7 @@ def get_lane_center(img, lanes):
     if lanes is not None:
         for lane in lanes:
             slope, intercept = lane_detection.get_slopes_intercepts(img, lane)
-            cenSl = (slope[0] + slope[1])/2
+            cenSl = 1((1/slope[0] + 1/slope[1])/2)
             cenInt = (intercept[0] + intercept[1])/2
             cenSlopes.append(cenSl)
             cenInters.append(cenInt)
@@ -30,14 +30,15 @@ def get_lane_center(img, lanes):
         slInters = [(cenSlopes)[index], (cenInters)[index]]
     return slInters
 
-def recommend_direction(center, slope):
+def recommend_direction(img, center, slope):
     """Recommends the direction that the AUV should move in order to follow a lane
     args:
         center (int or float): center point of intercepts
         slope (int or float): average slope
     return:
         (list): list of suggested strafe and turn direction"""
-    if center >= 1020 and center <= 1220:
+    width = img.shape[1] / 2
+    if center >= (width - 50) and center <= (width + 50):
         direction =  "forward"
     elif center > 1220:
         direction = "right"
