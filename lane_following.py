@@ -21,7 +21,7 @@ def get_lane_center(img, lanes):
     if lanes is not None:
         for lane in lanes:
             slope, intercept = lane_detection.get_slopes_intercepts(img, lane)
-            cenSl = 1((1/slope[0] + 1/slope[1])/2)
+            cenSl = 1/((1/slope[0] + 1/slope[1])/2)
             cenInt = (intercept[0] + intercept[1])/2
             cenSlopes.append(cenSl)
             cenInters.append(cenInt)
@@ -54,11 +54,11 @@ def recommend_direction(img, center, slope):
     
 if __name__ == "__main__":
     image = cv2.imread('lanes.png')
-    img = cv2.resize(image, (image.shape[1] // 2, image.shape[0] // 2))
+    img = cv2.resize(image, (1912, 1069))
     lines = lane_detection.detect_lines(img, 30, 100, 3, 229, 13)
     lanes = lane_detection.detect_lanes(img, lines)
     center = get_lane_center(img, lanes)
-    action = recommend_direction(center[0], center[1])
+    action = recommend_direction(img, center[0], center[1])
     print(f"Possible lines: {lines}") # [[1415, 531, 1676, 563], [514, 1047, 699, 738], [1441, 573, 1674, 618], [712, 1068, 765, 839], [557, 973, 706, 725]]
     print(f"Possible lanes: {lanes}") # [[[514, 1047, 699, 738], [712, 1068, 765, 839]]]
     print(f"Center slope and intercept: {center}") # [-2.9955124936257014, 606.2985189581832]

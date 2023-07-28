@@ -125,7 +125,8 @@ def draw_lanes(img, lanes):
 # cv2.line(image, start_point, end_point, color, thickness) 
 if __name__ == "__main__":
     image = cv2.imread('lanes.png')
-    img = cv2.resize(image, (image.shape[1] // 2, image.shape[0] // 2))
+    img = cv2.resize(image, (1912, 1069))
+    print(img.shape)
     lines = detect_lines(img, 30, 100, 3, 229, 13)
     lanes = detect_lanes(img, lines)
     print(f"Possible lines: {lines}")
