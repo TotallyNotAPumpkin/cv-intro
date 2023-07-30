@@ -43,12 +43,14 @@ def recommend_direction(img, center, slope):
     elif center > 1220:
         direction = "right"
     else:
-        direction = "right"
+        direction = "left"
 
-    if slope > 0:
+    if slope > 2.5:
         turn = "left"
-    if slope < 0:
+    if slope < 2.5:
         turn = "right"
+    else: 
+        turn = "don't turn"
     return [direction, turn]
 
     
