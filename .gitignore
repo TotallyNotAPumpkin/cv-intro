@@ -160,6 +160,4 @@ cython_debug/
 #.idea/
 
 # any videos and images
-img1.jpg
 output_videoo.avi
-rov_pool.jpg
