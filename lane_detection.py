@@ -121,9 +121,10 @@ def draw_lanes(img, lanes):
         image = cv2.imread(img)
     else:
         image = img
-    for lane in lanes:
-        for line in lane:
-            cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 255, 255), 4) 
+    if lanes != []:
+        for lane in lanes:
+            for line in lane:
+                cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 255, 255), 4)
     return image
 
 # cv2.line(image, start_point, end_point, color, thickness) 
