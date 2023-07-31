@@ -124,7 +124,7 @@ def draw_lanes(img, lanes):
     for lane in lanes:
         for line in lane:
             cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 255, 255), 4) 
-    plt.imshow(image)
+    return image
 
 # cv2.line(image, start_point, end_point, color, thickness) 
 if __name__ == "__main__":
