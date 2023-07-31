@@ -95,17 +95,17 @@ def detect_lanes(imageInput, lines):
         intercept1, intercept2 = list(lineDict)[i-1], list(lineDict)[i]
         slope1, slope2 = list(lineDict.values())[i-1], list(lineDict.values())[i]
         if abs(intercept1 - intercept2) < 350 and abs(intercept1 - intercept2) > 10 and abs(slope1 - slope2) < 4 and abs(slope1 - slope2) > 0.03:
-            # find the fuckin in between line darkness
-            centerM2 = int((intercept1 + intercept2) / 2 - 2)
-            averageDark = 0
-            for pixel in range(centerM2, (centerM2 + 5)):
-                colorValue = img[(height-2)][pixel]
-                averageDark += colorValue
-            if (averageDark/5) <= 75:
+            # # find the fuckin in between line darkness
+            # centerM2 = int((intercept1 + intercept2) / 2 - 2)
+            # averageDark = 0
+            # for pixel in range(centerM2, (centerM2 + 5)):
+            #     colorValue = img[(height-2)][pixel]
+            #     averageDark += colorValue
+            # if (averageDark/5) <= 75:
             # finds indices of lines list that correspond to lanes
-                index1, index2 = intercepts.index(list(lineDict)[i-1]), intercepts.index(list(lineDict)[i])
-                line1, line2 = lines[index1], lines[index2]
-                possibleLanes.append([line1, line2])
+            index1, index2 = intercepts.index(list(lineDict)[i-1]), intercepts.index(list(lineDict)[i])
+            line1, line2 = lines[index1], lines[index2]
+            possibleLanes.append([line1, line2])
     return possibleLanes
 
 

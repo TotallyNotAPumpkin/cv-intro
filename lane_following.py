@@ -37,22 +37,37 @@ def recommend_direction(img, center, slope):
         slope (int or float): average slope
     return:
         (list): list of suggested strafe and turn direction"""
+    
+    # width = img.shape[1] / 2
+    # if center >= (width - 50) and center <= (width + 50):
+    #     direction =  "forward"
+    # elif center > 1220:
+    #     direction = "right"
+    # else:
+    #     direction = "left"
+
+    # if slope > 2.5:
+    #     turn = "left"
+    # if slope < 2.5:
+    #     turn = "right"
+    # else: 
+    #     turn = "don't turn"
+    # return [direction, turn]
     width = img.shape[1] / 2
-    if center >= (width - 50) and center <= (width + 50):
-        direction =  "forward"
-    elif center > 1220:
-        direction = "right"
-    else:
-        direction = "left"
-
-    if slope > 2.5:
-        turn = "left"
-    if slope < 2.5:
-        turn = "right"
-    else: 
-        turn = "don't turn"
-    return [direction, turn]
-
+    if center >= (width - 20) and center <= (width + 20) and abs(1/slope) <= 0.1:
+        direction =  "drive forward"
+        return[direction]
+    elif center > (width + 20):
+        direction = "strafe right"
+        return[direction]
+    elif center < (width - 20):
+        direction = "strafe left"
+        return[direction]
+    if center >= (width - 20) and center <= (width + 20) and slope <= -0.5:
+        direction = "turn right"
+    if center >= (width - 20) and center <= (width + 20) and slope >= 0.5: 
+        direction = "turn left"
+    return[direction]
     
 if __name__ == "__main__":
     image = cv2.imread('lanes.png')
@@ -64,4 +79,4 @@ if __name__ == "__main__":
     print(f"Possible lines: {lines}") # [[1415, 531, 1676, 563], [514, 1047, 699, 738], [1441, 573, 1674, 618], [712, 1068, 765, 839], [557, 973, 706, 725]]
     print(f"Possible lanes: {lanes}") # [[[514, 1047, 699, 738], [712, 1068, 765, 839]]]
     print(f"Center slope and intercept: {center}") # [-2.9955124936257014, 606.2985189581832]
-    print(f"Recommended action: strafe {action[0]} and turn {action[1]}")
+    print(f"Recommended action: {action}")
