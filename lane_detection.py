@@ -66,6 +66,8 @@ def get_slopes_intercepts(img, lines):
     intercepts = []
     height = img.shape[0]
     for line in lines:
+        if line[0] == line[2]:
+            line[0] += 1
         slope = (line[1] - line[3]) / (line[0] - line[2])
         slopes.append(slope)
         intercepts.append((height-line[1])/slope + line[0])
@@ -117,10 +119,12 @@ def draw_lanes(img, lanes):
         """
     if not isinstance(img, np.ndarray):
         image = cv2.imread(img)
+    else:
+        image = img
     for lane in lanes:
         for line in lane:
             cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 255, 255), 4) 
-    return image
+    plt.imshow(image)
 
 # cv2.line(image, start_point, end_point, color, thickness) 
 if __name__ == "__main__":
