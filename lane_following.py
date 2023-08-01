@@ -38,6 +38,41 @@ def get_lane_center(img, lanes):
         slInters = [cenSlopes[index], cenInters[index]]
     return slInters
 
+def videoDetection(vid, framesInVid):
+    output_video = cv2.VideoWriter('output_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (1912, 535))
+    # video.release() #Save video to disk.
+    # total_frames = []
+    # Capture frame-by-frame
+    if framesInVid == 0:
+        vid.get(cv2.CAP_PROP_FRAME_COUNT)
+    count = 1
+    while True:
+        ret, frame = vid.read()
+        if ret:
+            resized = (cv2.resize(frame, (1912, 1069)))
+            h = resized.shape[0]
+            w = resized.shape[1]
+            againResized = resized[int(h/2) : h, 0 : w]
+        
+            lines = lane_detection.detect_lines(againResized, 30, 100, 3, 229, 13)
+            if lines is not None:
+                lanes = lane_detection.detect_lanes(againResized, lines)   
+            else:
+                lanes = []
+            if len(lanes) != 0:
+                slInt = get_lane_center(againResized, lanes)
+                draw_lane_center(againResized, slInt) 
+
+            againResized = lane_detection.draw_lanes(againResized, lanes)
+            # total_frames.append(frame)
+            output_video.write(againResized)
+
+        print(count)
+        count += 1
+        if count >= framesInVid: break 
+        # if count >= 10: break
+    output_video.release()
+
 
 def draw_lane_center(img, slInt):
     if not isinstance(img, np.ndarray):

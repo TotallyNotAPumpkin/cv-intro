@@ -4,12 +4,14 @@ import numpy as np
 import lane_detection
 import lane_following
 
-def videoDetection(vid):
+def videoDetection(vid, framesInVid):
     output_video = cv2.VideoWriter('output_videoo.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (1912, 535))
     # video.release() #Save video to disk.
     # total_frames = []
     # Capture frame-by-frame
     count = 1
+    if framesInVid == 0:
+        vid.get(cv2.CAP_PROP_FRAME_COUNT)
     while True:
         ret, frame = vid.read()
         if ret:
@@ -28,7 +30,7 @@ def videoDetection(vid):
             output_video.write(frame)
         print(count)
         count += 1
-        if count >= vid.get(cv2.CAP_PROP_FRAME_COUNT): break # NOTE TO CHECK THIS OVER BECAUSE I DUNNO IF ITS >= OR ==
+        if count >= framesInVid: break # NOTE TO CHECK THIS OVER BECAUSE I DUNNO IF ITS >= OR ==
     output_video.release()
 
 if __name__ == "__main__":
