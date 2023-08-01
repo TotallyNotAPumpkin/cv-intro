@@ -12,7 +12,6 @@ def get_lane_center(img, lanes):
         (list): [centerSlope, centerIntercept]
         """
     
-
     if not isinstance(img, np.ndarray):
         img = cv2.imread(img)
     # find slopes and intercepts of all lines in the lanes
@@ -21,14 +20,36 @@ def get_lane_center(img, lanes):
     if lanes is not None:
         for lane in lanes:
             slope, intercept = lane_detection.get_slopes_intercepts(img, lane)
-            cenSl = 1/((1/slope[0] + 1/slope[1])/2)
-            cenInt = (intercept[0] + intercept[1])/2
-            cenSlopes.append(cenSl)
-            cenInters.append(cenInt)
-        cenInter = sorted(cenInters, key=lambda x: abs(img[1]/2 - x))[0]
+            cenSl = 1/((1/slope[0] + 1/slope[1])/2) # center slope float
+            cenInt = (intercept[0] + intercept[1])/2 # center int float
+            cenSlopes.append(cenSl) # list of center slopes of all lanes
+            cenInters.append(cenInt) # list of center slopes of all intercepts
+
+            cenInters.sort()
+            cenInter = cenInters[0]
+            for num in cenInters:
+                if abs(num - img.shape[1]/2) < abs(cenInter - img.shape[1]/2):
+                    cenInter = num
+                if num > img.shape[1]/2:
+                    break
+
+            # cenInter = sorted(cenInters, key=lambda x: abs(img[1]/2 - x))[0] # center slope that is closest to the center (but I don't think this works) 
         index = cenInters.index(cenInter)
-        slInters = [(cenSlopes)[index], (cenInters)[index]]
+        slInters = [cenSlopes[index], cenInters[index]]
     return slInters
+
+
+def draw_lane_center(img, slInt):
+    if not isinstance(img, np.ndarray):
+        image = cv2.imread(img)
+    else:
+        image = img
+    if slInt is not None:
+        slope = slInt[0]
+        intercept = slInt[1]
+        x2 = int((0 - (535 - slope * intercept)) / slope)
+        cv2.line(image, (int(intercept), 535), (x2, 0), (180, 0, 255), 4)
+    return image
 
 def recommend_direction(img, center, slope):
     """Recommends the direction that the AUV should move in order to follow a lane

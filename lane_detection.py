@@ -67,9 +67,11 @@ def get_slopes_intercepts(img, lines):
     height = img.shape[0]
     for line in lines:
         if line[0] == line[2]:
-            line[0] += 1
+            line[0] += 000000000.1
         slope = (line[1] - line[3]) / (line[0] - line[2])
         slopes.append(slope)
+        if slope == 0:
+            slope = 0000000000.1
         intercepts.append((height-line[1])/slope + line[0])
     return slopes, intercepts
 
