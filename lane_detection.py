@@ -18,7 +18,8 @@ def detect_lines(img, threshold1 = 50, threshold2 = 150, apertureSize = 3, minLi
         img = cv2.imread(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # convert to grayscale
     # grayCon = cv2.addWeighted(gray, 2, gray, 0, 0)
-    edges = cv2.Canny(gray, threshold1, threshold2, apertureSize=apertureSize) # detect edges
+    (thresh, im_bw) = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    edges = cv2.Canny(im_bw, threshold1, threshold2, apertureSize=apertureSize) # detect edges
     lines = cv2.HoughLinesP(
                     edges,
                     1,
@@ -96,7 +97,7 @@ def detect_lanes(imageInput, lines):
         # checks if slopes and intercepts are similar
         intercept1, intercept2 = list(lineDict)[i-1], list(lineDict)[i]
         slope1, slope2 = list(lineDict.values())[i-1], list(lineDict.values())[i]
-        if abs(intercept1 - intercept2) < 350 and abs(intercept1 - intercept2) > 10 and abs(slope1 - slope2) < 4 and abs(slope1 - slope2) > 0.03:
+        if abs(intercept1 - intercept2) < 400 and abs(intercept1 - intercept2) > 50 and abs(slope1 - slope2) < 4 and abs(slope1 - slope2) > 0.03:
             # # find the fuckin in between line darkness
             # centerM2 = int((intercept1 + intercept2) / 2 - 2)
             # averageDark = 0

@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import lane_detection
 
+
+
 def get_lane_center(img, lanes):
     """Find the center of the lane closest to the middle of a list of given lanes
     args: 
@@ -38,15 +40,17 @@ def get_lane_center(img, lanes):
         slInters = [cenSlopes[index], cenInters[index]]
     return slInters
 
-def videoDetection(vid, framesInVid):
+
+
+def videoDetection(vid):
     output_video = cv2.VideoWriter('output_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (1912, 535))
     # video.release() #Save video to disk.
     # total_frames = []
     # Capture frame-by-frame
-    if framesInVid == 0:
-        vid.get(cv2.CAP_PROP_FRAME_COUNT)
+
     count = 1
-    while True:
+    ret, frame = vid.read()
+    while ret:
         ret, frame = vid.read()
         if ret:
             resized = (cv2.resize(frame, (1912, 1069)))
@@ -54,7 +58,7 @@ def videoDetection(vid, framesInVid):
             w = resized.shape[1]
             againResized = resized[int(h/2) : h, 0 : w]
         
-            lines = lane_detection.detect_lines(againResized, 30, 100, 3, 229, 13)
+            lines = lane_detection.detect_lines(againResized, 50, 50, 3, 100, 10)
             if lines is not None:
                 lanes = lane_detection.detect_lanes(againResized, lines)   
             else:
@@ -67,10 +71,45 @@ def videoDetection(vid, framesInVid):
             # total_frames.append(frame)
             output_video.write(againResized)
 
-        print(count)
+        print(ret)
+        print(f"Frame: {count}")
         count += 1
-        if count >= framesInVid: break 
-        # if count >= 10: break
+    output_video.release()
+
+
+
+def videoDetectionFrames(vid, framesVid):
+    output_video = cv2.VideoWriter('output_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (1912, 535))
+    # video.release() #Save video to disk.
+    # total_frames = []
+    # Capture frame-by-frame
+
+    count = 1
+    while True:
+        ret, frame = vid.read()
+        if ret:
+            resized = (cv2.resize(frame, (1912, 1069)))
+            h = resized.shape[0]
+            w = resized.shape[1]
+            againResized = resized[int(h/2) : h, 0 : w]
+        
+            lines = lane_detection.detect_lines(againResized, 50, 50, 3, 100, 10)
+            if lines is not None:
+                lanes = lane_detection.detect_lanes(againResized, lines)   
+            else:
+                lanes = []
+            if len(lanes) != 0:
+                slInt = get_lane_center(againResized, lanes)
+                draw_lane_center(againResized, slInt) 
+
+            againResized = lane_detection.draw_lanes(againResized, lanes)
+            # total_frames.append(frame)
+            output_video.write(againResized)
+
+        print(ret)
+        print(f"Frame: {count}")
+        count += 1
+        if count > framesVid: break
     output_video.release()
 
 
@@ -82,6 +121,8 @@ def draw_lane_center(img, slInt):
     if slInt is not None:
         slope = slInt[0]
         intercept = slInt[1]
+        if slope == 0:
+            slope = 0.0000000001
         x2 = int((0 - (535 - slope * intercept)) / slope)
         cv2.line(image, (int(intercept), 535), (x2, 0), (180, 0, 255), 4)
     return image
