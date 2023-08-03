@@ -58,7 +58,7 @@ def videoDetection(vid):
             w = resized.shape[1]
             againResized = resized[int(h/2) : h, 0 : w]
         
-            lines = lane_detection.detect_lines(againResized, 50, 50, 3, 100, 10)
+            lines = lane_detection.detect_lines(againResized, 50, 70, 3, 200, 10)
             if lines is not None:
                 lanes = lane_detection.detect_lanes(againResized, lines)   
             else:

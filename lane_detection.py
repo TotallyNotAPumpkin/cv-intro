@@ -18,8 +18,8 @@ def detect_lines(img, threshold1 = 50, threshold2 = 150, apertureSize = 3, minLi
         img = cv2.imread(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # convert to grayscale
     # grayCon = cv2.addWeighted(gray, 2, gray, 0, 0)
-    (thresh, im_bw) = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    edges = cv2.Canny(im_bw, threshold1, threshold2, apertureSize=apertureSize) # detect edges
+    # (thresh, im_bw) = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    edges = cv2.Canny(gray, threshold1, threshold2, apertureSize=apertureSize) # detect edges
     lines = cv2.HoughLinesP(
                     edges,
                     1,
@@ -68,11 +68,11 @@ def get_slopes_intercepts(img, lines):
     height = img.shape[0]
     for line in lines:
         if line[0] == line[2]:
-            line[0] += 000000000.1
+            line[0] += 0.000000001
         slope = (line[1] - line[3]) / (line[0] - line[2])
         slopes.append(slope)
         if slope == 0:
-            slope = 0000000000.1
+            slope = 0.0000000001
         intercepts.append((height-line[1])/slope + line[0])
     return slopes, intercepts
 
