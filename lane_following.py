@@ -19,13 +19,16 @@ def get_lane_center(img, lanes):
     # find slopes and intercepts of all lines in the lanes
     cenSlopes = []
     cenInters = []
+    cenIntersy = []
     if lanes is not None:
         for lane in lanes:
             slope, intercept = lane_detection.get_slopes_intercepts(img, lane)
             cenSl = 1/((1/slope[0] + 1/slope[1])/2) # center slope float
             cenInt = (intercept[0] + intercept[1])/2 # center int float
+            cenInty = ((lane[0][1]-lane[0][0]*slope[0])+(lane[1][1]-lane[1][0]*slope[1]))/2
             cenSlopes.append(cenSl) # list of center slopes of all lanes
             cenInters.append(cenInt) # list of center slopes of all intercepts
+            cenIntersy.append(cenInty)
 
             cenInters.sort()
             cenInter = cenInters[0]
@@ -37,7 +40,7 @@ def get_lane_center(img, lanes):
 
             # cenInter = sorted(cenInters, key=lambda x: abs(img[1]/2 - x))[0] # center slope that is closest to the center (but I don't think this works) 
         index = cenInters.index(cenInter)
-        slInters = [cenSlopes[index], cenInters[index]]
+        slInters = [cenSlopes[index], cenInters[index], cenIntersy[index]]
     return slInters
 
 
@@ -123,8 +126,10 @@ def draw_lane_center(img, slInt):
         intercept = slInt[1]
         if slope == 0:
             slope = 0.0000000001
-        x2 = int((0 - (535 - slope * intercept)) / slope)
-        cv2.line(image, (int(intercept), 535), (x2, 0), (180, 0, 255), 4)
+            cv2.line(image, (0, slInt[2]), (img.shape[1], slInt[2]))
+        else: 
+            x2 = int((0 - (535 - slope * intercept)) / slope)
+            cv2.line(image, (int(intercept), 535), (x2, 0), (180, 0, 255), 4)
     return image
 
 def recommend_direction(img, center, slope):
