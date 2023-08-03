@@ -16,10 +16,11 @@ def detect_lines(img, threshold1 = 50, threshold2 = 150, apertureSize = 3, minLi
     """
     if not isinstance(img, np.ndarray):
         img = cv2.imread(img)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # convert to grayscale
+    grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # convert to grayscale
     # grayCon = cv2.addWeighted(gray, 2, gray, 0, 0)
-    # (thresh, im_bw) = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    edges = cv2.Canny(gray, threshold1, threshold2, apertureSize=apertureSize) # detect edges
+    imgblur = cv2.blur(grayimg, [10, 10])
+    (thresh, im_bw) = cv2.threshold(imgblur, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    edges = cv2.Canny(im_bw, threshold1, threshold2, apertureSize=apertureSize) # detect edges
     lines = cv2.HoughLinesP(
                     edges,
                     1,
