@@ -79,7 +79,10 @@ def videoDetection(vid):
         count += 1
     output_video.release()
 
-
+def recommend_angle(slope):
+    laneAngle = np.arctan(slope)
+    return laneAngle
+    
 
 def videoDetectionFrames(vid, framesVid):
     output_video = cv2.VideoWriter('output_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (1912, 535))
@@ -116,20 +119,26 @@ def videoDetectionFrames(vid, framesVid):
     output_video.release()
 
 
+
 def draw_lane_center(img, slInt):
     if not isinstance(img, np.ndarray):
         image = cv2.imread(img)
     else:
         image = img
+
     if slInt is not None:
         slope = slInt[0]
         intercept = slInt[1]
+        angle = recommend_angle(slope)
         if slope == 0:
             slope = 0.0000000001
             cv2.line(image, (0, slInt[2]), (img.shape[1], slInt[2]))
+            cv2.putText(image, f'Angle: {round(angle, 3)}', (20, 300), 0, 1, (255, 0, 255), 3)
         else: 
             x2 = int((0 - (535 - slope * intercept)) / slope)
             cv2.line(image, (int(intercept), 535), (x2, 0), (180, 0, 255), 4)
+            cv2.putText(image, f'Angle: {round(angle, 3)}', (20, 300), 0, 1, (255, 0, 255), 3)
+
     return image
 
 def recommend_direction(img, center, slope):
@@ -170,7 +179,8 @@ def recommend_direction(img, center, slope):
     if center >= (width - 20) and center <= (width + 20) and slope >= 0.5: 
         direction = "turn left"
     return[direction]
-    
+
+
 if __name__ == "__main__":
     image = cv2.imread('lanes.png')
     img = cv2.resize(image, (1912, 1069))
